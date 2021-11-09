@@ -96,6 +96,8 @@ while t <= Tend:
     teta1 = integral(teta2)
     teta = integral(teta1)
 
+
+
     print(teta_1_cmd, teta_2_cmd, teta2, teta1, teta)
     t += dt
 
