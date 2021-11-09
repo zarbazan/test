@@ -1,19 +1,18 @@
 i = 0
 a = 1
+c = 2
 
-def test(b):
+def test(b, d):
     b+=b
-    return b
+    d=d**2
+    return b, d
 
 
 while (i < 10):
-    a, c = test(a), test(a)
+    a, c = test(a, c)
 
-    print(a, c)
+    print(a, c, -c)
     i+=1
 
 
 
-P 1000.0 I 1010.0 D 500.0
-P 100000.0 I 101000.0 D 50000.0
-1000 1000 -0.7562469138557764
