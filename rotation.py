@@ -62,7 +62,7 @@ def PID(error, Kp, Ki, Kd, error_past, Lim):
     elif (PID < -Lim):
         PID = -Lim
 
-    print("P", P, "I", I, "D", D)
+    #print("P", P, "I", I, "D", D)
 
     return PID
 
@@ -85,7 +85,7 @@ while t <= Tend:
 
     e_teta = error(teta_cmd, teta)               # расчет ошибки по положению
     teta_1_cmd = PID(e_teta, kP, kI, kD, e_teta_past, Lim1)  # расчет  целевой скорости
-    print(e_teta, e_teta_past, teta_1_cmd)
+    #print(e_teta, e_teta_past, teta_1_cmd)
     e_teta_past = e_teta
 
     e_teta_1 = error(teta_1_cmd, teta1)   # расчет ошибки по скорости
