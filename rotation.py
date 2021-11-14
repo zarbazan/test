@@ -3,7 +3,7 @@
 
 from matplotlib import pyplot as plt
 
-teta_cmd = 30.0      # целевое положение
+teta_cmd = 40.0      # целевое положение
 teta_0 = 0.0   # начальное положение
 teta1_0 = 0.0  # начальная скорость
 teta2_0 = 0.0  # начальное ускорение
@@ -25,10 +25,10 @@ t0 = 0             # начало моделирования
 t = t0             # время
 Tcmd = 100           # целевая тяга
 Lim1 = 500        # ограничение по скорости
-Lim2 = 500        # ограничение по ускорению
+Lim2 = 10000        # ограничение по ускорению
 
-kP = 300
-kI = 10
+kP = 30
+kI = 1
 kD = 5
 
 kP1 = 2
@@ -37,6 +37,13 @@ kD1 = 0.5
 
 e_teta_past = 0
 e_teta_1_past = 0
+integral = 0
+integral1 = 0
+
+accList = []
+velList = []
+posList = []
+timeList = []
 
 
  #def integral(param):
@@ -49,10 +56,9 @@ def error(input1, input2):
 
 
 # PID вычислитель
-def PID(error, Kp, Ki, Kd, error_past, Lim):
-    integral = 0
+def PID(error, Kp, Ki, Kd, error_past, Lim, integral):
+
     P = Kp * error
-    integral += error * dt
     I = Ki * integral
     D = Kd * ((error - error_past)/dt)
     PID = P + I+ D
@@ -84,14 +90,18 @@ while t <= Tend:
 
 
     e_teta = error(teta_cmd, teta)               # расчет ошибки по положению
-    teta_1_cmd = PID(e_teta, kP, kI, kD, e_teta_past, Lim1)  # расчет  целевой скорости
-    #print(e_teta, e_teta_past, teta_1_cmd)
+    teta_1_cmd = PID(e_teta, kP, kI, kD, e_teta_past, Lim1, integral)  # расчет  целевой скорости
+    print(e_teta, "___", teta, "___", e_teta_past, "___", teta_1_cmd, "___", integral)
     e_teta_past = e_teta
+    integral += e_teta * dt
+
+
 
     e_teta_1 = error(teta_1_cmd, teta1)   # расчет ошибки по скорости
-    teta_2_cmd = PID(e_teta_1, kP1, kI1, kD1, e_teta_1_past, Lim2)   # расчет  целевого ускорения
-    #print(e_teta_1, e_teta_1_past, teta_2_cmd)
+    teta_2_cmd = PID(e_teta_1, kP1, kI1, kD1, e_teta_1_past, Lim2, integral1)   # расчет  целевого ускорения
+    print(e_teta_1, "___", e_teta_1_past, "___", teta_2_cmd)
     e_teta_1_past = e_teta_1
+    integral1 += e_teta_1 * dt
 
     teta2 = model(teta_2_cmd, Tcmd, kb, l, Iy)
     teta1 += teta2 * dt
@@ -99,9 +109,34 @@ while t <= Tend:
 
 
 
-    print(teta2, teta1, teta)
-    print("___________")
+    accList.append(teta2)
+    velList.append(teta1)
+    posList.append(teta)
+    timeList.append(t)
+
     t += dt
 
+
+    #print(teta2, teta1, teta)
+    print("___________")
+
+f = plt.figure(constrained_layout=True)
+gs = f.add_gridspec(3, 5)
+ax1 = f.add_subplot(gs[0, :-1])
+ax1.plot(posList)
+ax1.grid()
+ax1.set_title('position')
+
+ax2 = f.add_subplot(gs[1, :-1])
+ax2.plot(velList, "g")
+ax2.grid()
+ax2.set_title('velocity')
+
+ax3 = f.add_subplot(gs[2, :-1])
+ax3.plot(accList, "r")
+ax3.grid()
+ax3.set_title('acceleration')
+
+plt.show()
 
 
